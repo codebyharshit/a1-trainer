@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A1 Trainer – Netzwerk neu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FBFCF8;--grid:#E2E9EF;--text:#23262B;--muted:#5E6670;--line:#CDD6DE;--panel:#FFFFFF;--soft:#F3F5F2;
+  --ink:#1F3FA8;--red:#C21F32;--ok:#1E7A46;--okbg:#E7F4EC;--badbg:#FBE9EB;
+  --der:#1F5FBF;--die:#C21F32;--das:#1E7A46;
+  --l-S:#1F5FBF;--l-V:#C21F32;--l-END:#7B3FB0;--l-AKK:#C2650A;--l-DAT:#0E7C86;--l-ZEIT:#2E7D32;--l-ORT:#8A5A2B;--l-ADJ:#B0367C;--l-X:#5E6670;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#15181D;--grid:#1E242B;--text:#E6E8EB;--muted:#9AA3AD;--line:#353E48;--panel:#1C2026;--soft:#20252C;
+  --ink:#8FB0FF;--red:#FF7A88;--ok:#6BD69A;--okbg:#17301F;--badbg:#361C21;--der:#7FAEFF;--die:#FF7A88;--das:#6BD69A;
+  --l-S:#7FAEFF;--l-V:#FF7A88;--l-END:#C79BFF;--l-AKK:#FFAA5C;--l-DAT:#5ED3DC;--l-ZEIT:#7FD58A;--l-ORT:#D9A877;--l-ADJ:#FF8CC6;--l-X:#9AA3AD}}
+:root[data-theme="dark"]{
+  --paper:#15181D;--grid:#1E242B;--text:#E6E8EB;--muted:#9AA3AD;--line:#353E48;--panel:#1C2026;--soft:#20252C;
+  --ink:#8FB0FF;--red:#FF7A88;--ok:#6BD69A;--okbg:#17301F;--badbg:#361C21;--der:#7FAEFF;--die:#FF7A88;--das:#6BD69A;
+  --l-S:#7FAEFF;--l-V:#FF7A88;--l-END:#C79BFF;--l-AKK:#FFAA5C;--l-DAT:#5ED3DC;--l-ZEIT:#7FD58A;--l-ORT:#D9A877;--l-ADJ:#FF8CC6;--l-X:#9AA3AD}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 60px)}
+body{margin:0;color:var(--text);background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px;
+  font-family:"Literata",Georgia,"Times New Roman",serif;font-size:17px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--panel)}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--panel);border-bottom:1px solid var(--line)}
+.topin{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:6px;padding:8px 14px;overflow-x:auto}
+.brand{font-weight:700;margin-right:8px;white-space:nowrap}
+.brand span{color:var(--red)}
+.tab{font:inherit;font-size:.95rem;background:none;border:none;color:var(--muted);padding:8px 10px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.tab.on{color:var(--ink);background:color-mix(in srgb,var(--ink) 10%,transparent);font-weight:600}
+.badge{display:inline-block;min-width:1.5em;padding:0 6px;border-radius:10px;background:var(--red);color:#fff;font-size:.75rem;text-align:center;margin-left:4px}
+.sync{margin-left:auto;font-size:.78rem;color:var(--muted);white-space:nowrap}
+main{max-width:860px;margin:0 auto;padding:22px 14px 90px}
+h1{font-size:1.9rem;line-height:1.15;margin:4px 0 6px}
+h2{font-size:1.25rem;margin:22px 0 8px}
+.lead{color:var(--muted);margin:0 0 18px;max-width:68ch}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px}
+.small{font-size:.86rem;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}
+.btn{font:inherit;font-size:.95rem;cursor:pointer;padding:9px 16px;border-radius:7px;border:2px solid var(--ink);background:transparent;color:var(--ink)}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.ghost{border-color:var(--line);color:var(--text)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.chip{font:inherit;font-size:.85rem;cursor:pointer;padding:5px 11px;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--muted)}
+.chip.on{border-color:var(--ink);color:var(--ink);background:color-mix(in srgb,var(--ink) 8%,transparent)}
+.chip .c{opacity:.6;font-size:.8em;margin-left:2px}
+.grp{margin:10px 0 4px;font-size:.8rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.link{background:none;border:none;color:var(--ink);text-decoration:underline;cursor:pointer;font:inherit;font-size:.86rem;padding:0}
+.hidden{display:none!important}
+/* quiz */
+.pcard{margin-bottom:6px}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.plab{font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.pnum{font-family:"Kalam",cursive;font-size:2.1rem;line-height:1.1;color:var(--ink)}
+.tag{display:inline-block;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;padding:1px 7px;border-radius:9px;margin-left:6px;border:1px solid currentColor}
+.tag.new{color:var(--ok)}.tag.rev{color:var(--ink)}.tag.again{color:var(--red)}
+.mbar{display:inline-block;width:110px;height:7px;border-radius:4px;background:var(--line);overflow:hidden;vertical-align:middle;margin-right:6px}
+.mbar i{display:block;height:100%;background:var(--ok)}
+.audio{display:flex;gap:8px;margin:-6px 0 14px}
+.typebox{display:grid;gap:8px}
+.typebox input{font:inherit;font-size:1.15rem;padding:10px 12px;border:2px solid var(--line);border-radius:7px;background:var(--panel);color:var(--text);width:100%}
+.typebox input:focus{border-color:var(--ink);outline:none}
+.uml{display:flex;gap:6px;flex-wrap:wrap}
+.uml button{font:inherit;min-width:2.4em;padding:4px 8px;border-radius:6px;border:1.5px solid var(--line);background:var(--panel);color:var(--text);cursor:pointer}
+.sayres{font-size:.92rem;margin-top:6px}
+.sayres .miss{color:var(--red);text-decoration:underline wavy}
+.sayres .hit{color:var(--ok)}
+.prog{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:12px}
+.prog i{display:block;height:100%;background:var(--ink);transition:width .25s}
+.meta{display:flex;justify-content:space-between;gap:10px;font-size:.85rem;color:var(--muted);margin-bottom:8px}
+.meta button{font:inherit;font-size:.85rem;color:var(--muted);background:none;border:none;padding:0;cursor:pointer;text-decoration:underline dotted}
+.prompt{font-size:1.4rem;font-weight:600;margin:4px 0 16px;line-height:1.35}
+.prompt .gap{display:inline-block;min-width:3.5em;border-bottom:3px solid var(--ink);text-align:center;color:var(--ink);font-family:"Kalam",cursive}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;cursor:pointer;padding:12px 14px;border-radius:7px;border:1.5px solid var(--line);background:var(--panel);color:var(--text);display:flex;gap:10px;align-items:baseline}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt .k{color:var(--muted);font-size:.8rem;min-width:1em}
+.opt.ok{border-color:var(--ok);background:var(--okbg);color:var(--ok);font-weight:600}
+.opt.bad{border-color:var(--red);background:var(--badbg);color:var(--red)}
+.opt.bad .t{text-decoration:line-through}
+.fb{margin-top:16px;display:grid;gap:10px}
+.box{border-radius:7px;padding:10px 14px;font-size:.95rem}
+.box h4{margin:0 0 4px;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.box.why{background:var(--badbg);border-left:4px solid var(--red)}
+.box.rule{background:color-mix(in srgb,var(--ink) 7%,transparent);border-left:4px solid var(--ink)}
+.box.ok{background:var(--okbg);border-left:4px solid var(--ok)}
+.verdict{font-family:"Kalam",cursive;font-size:1.25rem}
+.struct{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start}
+.seg{border:1.5px solid currentColor;border-radius:6px;padding:4px 8px;cursor:pointer;background:var(--panel);font:inherit;text-align:center;color:var(--l-X)}
+.seg .tx{display:block;color:var(--text);font-weight:600}
+.seg .lb{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.03em;margin-top:1px}
+.seg.plain{border-style:dashed}
+.segexp{font-size:.88rem;color:var(--muted);min-height:1.2em;margin-top:6px}
+details.lesson{background:var(--soft);border:1px solid var(--line);border-radius:7px;padding:4px 14px}
+details.lesson summary{cursor:pointer;font-weight:600;padding:6px 0;color:var(--ink)}
+details.lesson p{margin:4px 0 10px;font-size:.95rem}
+.ask{border:1px solid var(--line);border-radius:7px;padding:10px 14px;background:var(--panel)}
+.ask textarea{width:100%;font:inherit;font-size:.95rem;border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--paper);color:var(--text);min-height:60px;resize:vertical}
+.answer{white-space:pre-wrap;font-size:.95rem;margin-top:8px}
+.big{font-family:"Kalam",cursive;font-size:2.6rem;color:var(--ink);margin:0}
+table{width:100%;border-collapse:collapse;font-size:.92rem;margin:8px 0}
+td,th{padding:6px;border-bottom:1px solid var(--line);text-align:left}
+td.r{text-align:right;white-space:nowrap}
+.bar{display:inline-block;height:8px;border-radius:4px;background:var(--ok);vertical-align:middle}
+.tw{overflow-x:auto}
+/* mistakes */
+.mist{border-top:1px solid var(--line);padding:12px 0}
+.mist .q{font-weight:600}
+.mist .y{color:var(--red);text-decoration:line-through}
+.mist .a{color:var(--ok);font-weight:600}
+.mist .tools{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap}
+.cnt{font-family:"Kalam",cursive;color:var(--red)}
+/* dictionary */
+.controls{position:sticky;top:calc(env(safe-area-inset-top,0px) + 52px);z-index:5;background:var(--paper);padding:10px 0;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+input[type=search],select{font:inherit;font-size:.92rem;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--text)}
+input[type=search]{flex:1 1 170px;min-width:140px}
+.ab{font:inherit;font-size:.88rem;cursor:pointer;padding:6px 11px;border-radius:6px;border:2px solid var(--line);background:var(--panel);color:var(--text)}
+.ab.on{border-color:var(--ink);color:var(--ink);font-weight:600}
+.ab.der.on{border-color:var(--der);color:var(--der)}.ab.die.on{border-color:var(--die);color:var(--die)}.ab.das.on{border-color:var(--das);color:var(--das)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:6px}
+.w{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:5px;padding:6px 10px}
+.w.der{border-left-color:var(--der)}.w.die{border-left-color:var(--die)}.w.das{border-left-color:var(--das)}
+.w .top{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.w .ar{font-weight:700}.w.der .ar{color:var(--der)}.w.die .ar{color:var(--die)}.w.das .ar{color:var(--das)}
+.w .n{font-weight:600}
+.w .r{font-size:.82rem;color:var(--muted)}
+.w .e{font-size:.84rem;color:var(--muted);font-style:italic}
+.w .x{font-size:.78rem;color:var(--muted)}
+.guess{display:flex;gap:4px;margin-top:5px}
+.guess button{font:inherit;font-size:.8rem;padding:2px 9px;border-radius:4px;border:1px solid var(--line);background:transparent;color:var(--text);cursor:pointer}
+.guess button.ok{background:var(--okbg);border-color:var(--das);color:var(--das);font-weight:700}
+.guess button.bad{background:var(--badbg);border-color:var(--die);color:var(--die);text-decoration:line-through}
+#dscore{font-family:"Kalam",cursive;font-size:1.1rem;color:var(--ink)}
+.lg{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;font-size:.9rem}
+.lg ul{margin:0;padding-left:18px}
+.lesson-card{border-top:1px solid var(--line);padding:12px 0}
+.lesson-card h3{margin:0 0 4px;font-size:1.05rem}
+.lesson-card p{margin:4px 0 8px;font-size:.95rem}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+@media (max-width:560px){.pnum{font-size:1.6rem}.pgrid{gap:6px}.prompt{font-size:1.2rem}h1{font-size:1.6rem}.brand{display:none}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top"><div class="topin">
+  <div class="brand">A1 <span>Trainer</span></div>
+  <button class="tab on" data-tab="quiz">Quiz</button>
+  <button class="tab" data-tab="mist">Fehler<span class="badge hidden" id="mbadge">0</span></button>
+  <button class="tab" data-tab="dict">Wörterbuch</button>
+  <button class="tab" data-tab="gram">Grammatik</button>
+  <span class="sync" id="sync">…</span>
+</div></header>
+
+<main>
+<!-- QUIZ -->
+<section id="v-quiz">
+  <div id="setup">
+    <h1>A1 Wiederholung</h1>
+    <p class="lead"><span id="qcount"></span> questions across all 12 chapters of Netzwerk neu A1 plus every word in the dictionary. Your progress is saved after every answer: new material comes in course order, questions you miss come back a few questions later, and questions you know come back as spaced reviews (1 day, 3 days, a week …).</p>
+    <div class="card pcard" id="pcard">
+      <div class="pgrid">
+        <div><div class="plab">Learned</div><div class="pnum" id="pmast">0</div><div class="small" id="pmast2"></div></div>
+        <div><div class="plab">Due reviews</div><div class="pnum" id="pdue">0</div><div class="small">ready to repeat now</div></div>
+        <div><div class="plab">Today</div><div class="pnum" id="ptoday">0</div><div class="small" id="pstreak"></div></div>
+      </div>
+      <div class="prog" style="margin:14px 0 6px"><i id="pbarall"></i></div>
+      <div class="small" id="pseen"></div>
+      <div class="small" id="pnext" style="margin-top:6px"></div>
+      <div class="row"><label class="small"><input type="checkbox" id="typemode"> <b>Writing practice:</b> type the answer to fill-in-the-gap questions instead of choosing</label></div>
+      <div class="row" style="margin-bottom:0">
+        <button class="btn primary" id="learn">Weiter lernen →</button>
+        <span class="small" id="learnhint"></span>
+      </div>
+    </div>
+    <h2>Practise specific topics</h2>
+    <div class="card">
+      <div class="row" style="margin-top:0"><b>Topics</b> <button class="link" id="tall">all</button> · <button class="link" id="tnone">none</button></div>
+      <div id="tchips"></div>
+      <div class="row"><b>Length</b>
+        <button class="chip" data-n="10">10</button><button class="chip on" data-n="20">20</button><button class="chip" data-n="50">50</button><button class="chip" data-n="100">100</button><button class="chip" data-n="9999">all</button>
+      </div>
+      <div class="row">
+        <button class="btn primary" id="start">Start</button>
+        <button class="btn" id="startweak">My weakest topics</button>
+        <button class="btn" id="startmist">Repeat mistakes (<span id="mc2">0</span>)</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="quiz" class="card hidden">
+    <div class="prog"><i id="pbar"></i></div>
+    <div class="meta"><span><button id="qtopic" title="Show the lesson"></button><span id="qtag"></span></span><span id="qcnt"></span></div>
+    <div class="prompt" id="qprompt"></div>
+    <div class="opts" id="qopts"></div>
+    <div class="fb hidden" id="qfb"></div>
+    <div class="row">
+      <button class="btn primary hidden" id="qnext">Weiter →</button>
+      <button class="link" id="qquit">End round</button>
+      <span class="small" id="qkeys">Keys: 1–4 answer · Enter next</span>
+    </div>
+  </div>
+
+  <div id="result" class="card hidden">
+    <p class="big" id="rscore"></p>
+    <p id="rverdict"></p>
+    <div class="tw"><table id="rtab"></table></div>
+    <div class="row">
+      <button class="btn primary" id="ragain">New round</button>
+      <button class="btn" id="rredo">Repeat this round's mistakes</button>
+    </div>
+    <div id="rwrong"></div>
+  </div>
+</section>
+
+<!-- MISTAKES -->
+<section id="v-mist" class="hidden">
+  <h1>Meine Fehler</h1>
+  <p class="lead">Every question you got wrong, saved <span id="where">in this browser</span>. A mistake counts as <b>learned</b> after you answer it right twice in a row. You can also ask Claude in this chat about them — e.g. “look at my saved mistakes and explain my Akkusativ errors”.</p>
+  <div class="row">
+    <button class="btn primary" id="mpractice">Practise open mistakes</button>
+    <button class="btn" id="mart">Practise article mistakes</button>
+    <button class="btn" id="mpattern">Ask Claude: what are my patterns?</button>
+    <label class="small"><input type="checkbox" id="mshowl"> show learned</label>
+  </div>
+  <div class="ask hidden" id="mpatbox"><div class="answer" id="mpatans"></div></div>
+  <div id="mlist"></div>
+</section>
+
+<!-- DICTIONARY -->
+<section id="v-dict" class="hidden">
+  <h1>der · die · das — <span id="dcount"></span> Wörter</h1>
+  <p class="lead">The most frequent German nouns, with article, plural, meaning and the reason for the article in brackets. Colours follow your book: <b style="color:var(--der)">der</b> · <b style="color:var(--die)">die</b> · <b style="color:var(--das)">das</b>. Switch on <b>Quiz</b> to hide the articles — wrong answers are saved to your mistakes.</p>
+  <details class="lesson" style="margin-bottom:12px"><summary>What the reasons mean</summary>
+    <div class="lg">
+      <div><b style="color:var(--der)">→ der</b><ul><li><b>male</b> male people & animals</li><li><b>day · month · season · daytime · weather · direction</b></li><li><b>-en</b> (not a verb): Garten · <b>-er</b> people/tools · <b>-ling -ismus -ist -or -ant -ent -ig -ich -eur</b></li></ul></div>
+      <div><b style="color:var(--die)">→ die</b><ul><li><b>female · -in</b></li><li><b>-e</b> ~90%</li><li><b>-ung -heit -keit -schaft -ion -tät -kunft</b> 100%</li><li><b>-ik -ie -ei -ur -enz -anz -age -ade -ette -a</b></li></ul></div>
+      <div><b style="color:var(--das)">→ das</b><ul><li><b>-chen -lein</b> 100%</li><li><b>Ge-</b> · <b>verb</b> (das Essen)</li><li><b>-um -ment -ma -o -zeug -nis -tum -il -ett</b></li><li><b>foreign</b> loanwords (tendency)</li></ul></div>
+      <div><b>Special</b><ul><li><b>compound</b> the LAST part decides (← base word shown)</li><li><b>exception</b> breaks a rule</li><li><b>two genders</b> meaning changes with the article</li><li><b>learn</b> no reliable rule — learn it with the word</li></ul></div>
+    </div>
+  </details>
+  <div class="controls">
+    <input type="search" id="dq" placeholder="Search German or English…" aria-label="Search">
+    <select id="dband" aria-label="Frequency"></select>
+    <select id="dtheme" aria-label="Topic"><option value="">All topics</option></select>
+    <button class="ab on" data-art="">alle</button><button class="ab der" data-art="der">der</button><button class="ab die" data-art="die">die</button><button class="ab das" data-art="das">das</button>
+    <button class="ab" id="dquiz">Quiz</button><button class="ab hidden" id="dshuf">Shuffle</button>
+    <span id="dscore"></span>
+  </div>
+  <div id="dlist"></div>
+  <div class="row"><button class="btn ghost hidden" id="dmore">Show more</button></div>
+</section>
+
+<!-- GRAMMAR -->
+<section id="v-gram" class="hidden">
+  <h1>Grammatik A1</h1>
+  <p class="lead">Every topic in course order, with the rule, your accuracy so far, and a button to practise just that topic.</p>
+  <div class="card"><b>Sentence-structure labels</b><div id="leg" class="struct" style="margin-top:8px"></div><div class="segexp" id="legexp">Tap a label to see what it means.</div></div>
+  <div id="glist"></div>
+</section>
+</main>
+
+<script>
+var QUESTIONS = /*__QUESTIONS__*/[];
+var TOPICS = /*__TOPICS__*/[];
+var LABELS = /*__LABELS__*/{};
+var DICT = /*__DICT__*/[];
+(function(){
+"use strict";
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function shuf(a){ a = a.slice(); for (var i = a.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
+function hash(s){ var h = 0; for (var i = 0; i < s.length; i++){ h = (h * 31 + s.charCodeAt(i)) | 0; } return (h >>> 0).toString(36); }
+var TOPIC = {}; TOPICS.forEach(function(t){ TOPIC[t[0]] = {key: t[0], title: t[1], ch: t[2], lesson: t[3]}; });
+var QBYID = {}; QUESTIONS.forEach(function(q){ QBYID[q.id] = q; });
+var LABCOL = {S:"S",NOM:"S",V:"V",V1:"V",IMP:"V",MV:"V",HV:"V",INF:"END",P2:"END",PRE:"END",AKK:"AKK",DAT:"DAT",ZEIT:"ZEIT",ORT:"ORT",ADJ:"ADJ",W:"X",KON:"X",NEG:"X",ADV:"X"};
+
+/* ---------------- storage: account (db) with local fallback ---------------- */
+var Store = {
+  mode: "local", col: null, data: {}, queue: Promise.resolve(), LKEY: "a1trainer-v1",
+  init: function(){
+    var self = this;
+    try { self.data = JSON.parse(localStorage.getItem(self.LKEY) || "{}"); } catch(e){ self.data = {}; }
+    self.renderSync();
+    if (!window.claude || !window.claude.use) return Promise.resolve();
+    return Promise.all([window.claude.use("db"), window.claude.use("user")]).then(function(r){
+      var db = r[0], user = r[1];
+      if (!db || !user) return;
+      return user.id().then(function(uid){
+        if (!uid) return;
+        self.col = db.collection("data/users/" + uid);
+        return self.col.get().then(function(snap){
+          var cloud = {};
+          snap.docs.forEach(function(d){ cloud[d.id] = d.data(); });
+          var local = self.data; self.data = cloud; self.mode = "cloud";
+          // migrate anything only stored locally
+          Object.keys(local).forEach(function(k){ if (!cloud[k]) self.put(k, local[k]); });
+          self.renderSync(); Prog.reload(); refreshCounts(); if (!$("setup").classList.contains("hidden")) renderProgress();
+        });
+      });
+    }).catch(function(){ self.renderSync(); });
+  },
+  get: function(id){ return this.data[id]; },
+  all: function(){ var d = this.data; return Object.keys(d).map(function(k){ return Object.assign({_id: k}, d[k]); }); },
+  put: function(id, doc){
+    var self = this; self.data[id] = doc;
+    if (self.mode === "cloud"){
+      self.queue = self.queue.then(function(){ return self.col.doc(id).set(JSON.parse(JSON.stringify(doc))); }).catch(function(){ self.flagError(); });
+    } else { try { localStorage.setItem(self.LKEY, JSON.stringify(self.data)); } catch(e){} }
+  },
+  del: function(id){
+    var self = this; delete self.data[id];
+    if (self.mode === "cloud"){ self.queue = self.queue.then(function(){ return self.col.doc(id).delete(); }).catch(function(){ self.flagError(); }); }
+    else { try { localStorage.setItem(self.LKEY, JSON.stringify(self.data)); } catch(e){} }
+  },
+  flagError: function(){ $("sync").textContent = "⚠︎ not saved"; },
+  renderSync: function(){
+    $("sync").textContent = this.mode === "cloud" ? "☁︎ saved to your account" : "saved in this browser";
+    $("where").textContent = this.mode === "cloud" ? "to your Claude account (Claude can read them in chat)" : "in this browser";
+  }
+};
+function now(){ return new Date().toISOString(); }
+function stats(){ return Store.get("stats") || {topics: {}, art: [0, 0], answered: 0}; }
+function bumpStats(topic, ok){
+  var s = stats(); s.topics = s.topics || {};
+  var t = s.topics[topic] || [0, 0]; t[1]++; if (ok) t[0]++; s.topics[topic] = t;
+  s.answered = (s.answered || 0) + 1; s.updated = now();
+  pendingStats = s;
+}
+var pendingStats = null, statsTimer = null;
+function flushStats(){ if (pendingStats){ Store.put("stats", pendingStats); pendingStats = null; } }
+function scheduleStats(){ clearTimeout(statsTimer); statsTimer = setTimeout(flushStats, 4000); }
+
+function recordQuiz(q, given, ok){
+  var id = "q_" + q.id, m = Store.get(id);
+  if (!ok){
+    m = m || {k: "quiz", qid: q.id, t: q.t, topic: TOPIC[q.t].title, p: q.p, c: q.o[0], wc: 0, first: now()};
+    m.wc++; m.g = given; m.gs = (m.gs || []).concat([given]).slice(-5); m.rc = 0; m.learned = false; m.last = now();
+    m.rule = q.w; m.why = (q.d && q.d[given]) || "";
+    m.sentence = q.s.map(function(x){ return x[0]; }).join(" ");
+    Store.put(id, m);
+  } else if (m && !m.learned){
+    m.rc = (m.rc || 0) + 1; m.lastRight = now(); if (m.rc >= 2) m.learned = true; Store.put(id, m);
+  }
+  bumpStats(q.t, ok); scheduleStats(); refreshCounts();
+}
+function recordArticle(w, given, ok){
+  var id = "a_" + hash(w.n) , m = Store.get(id);
+  if (!ok){
+    m = m || {k: "artikel", n: w.n, a: w.a, e: w.e, r: w.r, x: w.x || "", wc: 0, first: now()};
+    m.wc++; m.g = given; m.rc = 0; m.learned = false; m.last = now(); Store.put(id, m);
+  } else if (m && !m.learned){ m.rc = (m.rc || 0) + 1; if (m.rc >= 2) m.learned = true; Store.put(id, m); }
+  var s = stats(); s.art = s.art || [0, 0]; s.art[1]++; if (ok) s.art[0]++; pendingStats = s; scheduleStats(); refreshCounts();
+}
+function openMistakes(kind){ return Store.all().filter(function(m){ return m.k === kind && !m.learned; }); }
+function refreshCounts(){
+  var n = openMistakes("quiz").length + openMistakes("artikel").length;
+  $("mbadge").textContent = n; $("mbadge").classList.toggle("hidden", !n);
+  $("mc2").textContent = openMistakes("quiz").length; $("startmist").disabled = !openMistakes("quiz").length;
+}
+
+/* ---------------- Ask Claude (sample) ---------------- */
+var sampleFn = null;
+if (window.claude && window.claude.use){ window.claude.use("sample").then(function(s){ sampleFn = s; document.body.classList.toggle("has-sample", !!s); }).catch(function(){}); }
+function fmt(t){ return esc(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/(^|\n)#+\s*/g, "$1"); }
+function askClaude(prompt, out, btn){
+  if (!sampleFn){ out.innerHTML = "Asking Claude only works inside the Claude app. You can also paste the question into the chat."; return; }
+  out.textContent = "Thinking…"; if (btn) btn.disabled = true;
+  sampleFn(prompt, {onText: function(u){ out.innerHTML = fmt(u.text); }}).then(function(r){ out.innerHTML = fmt(r.text); })
+    .catch(function(e){ out.textContent = e && e.code === "not_granted" ? "Claude access wasn't allowed for this page." : (e && e.code === "rate_limited" ? "Too many requests — try again in a minute." : "Couldn't reach Claude right now."); })
+    .then(function(){ if (btn) btn.disabled = false; });
+}
+var TUTOR = "You are a patient German tutor. The learner finished A1 (Netzwerk neu) and is around A2. Explain in clear, simple English with short German examples. Be concise (under 170 words), no headings, no tables. ";
+
+/* ---------------- tabs ---------------- */
+document.querySelectorAll(".tab").forEach(function(b){ b.onclick = function(){ showTab(b.dataset.tab); }; });
+function showTab(t){
+  document.querySelectorAll(".tab").forEach(function(x){ x.classList.toggle("on", x.dataset.tab === t); });
+  ["quiz","mist","dict","gram"].forEach(function(k){ $("v-" + k).classList.toggle("hidden", k !== t); });
+  if (t === "mist") renderMistakes(); if (t === "dict") renderDict(true); if (t === "gram") renderGram();
+  flushStats(); Prog.flush(); window.scrollTo(0, 0);
+}
+
+/* ---------------- progress (per question) ---------------- */
+// Each topic keeps one doc "p_<topic>" = {qid: [box, dueMinute, seen, right, lastMinute]}.
+// box 0 = new · 1 = learning (missed) · 2.. = known, reviewed at growing intervals · box >= 4 counts as mastered.
+var MINUTE = 60000, INTERVALS = [0, 5, 1440, 4320, 10080, 23040, 50400], MASTER_BOX = 4, DAILY_GOAL = 30;
+var GROUPS = [["K1–3", ["verb","verb_irr","seinhaben","wfrage","laender","janein","artikel","plural","einkein","adjektiv","zahlen"]],
+  ["K4–6", ["akk","akkpraep","moegen","uhrzeit","zeitpraep","datum","poss","modal","trenn","praet"]],
+  ["K7–9", ["konnektor","dativ","vergleich","wechsel","satzbau"]], ["K10–12", ["perf_p2","perf_aux","pron","welcher","man_wer","zeitdativ"]], ["Alltag", ["alltag","imp"]],
+  ["Wortschatz", ["wort_art","wort_bed","wort_pl","wort_verb","wort_adj"]], ["Hören", ["hoeren"]]];
+// side track: vocabulary and listening run alongside the grammar course, introduced by rank (q.r)
+var VOCAB = ["wort_art", "wort_bed", "wort_pl", "wort_verb", "wort_adj", "hoeren"];
+var COURSE = []; GROUPS.forEach(function(g){ g[1].forEach(function(k){ if (TOPIC[k] && VOCAB.indexOf(k) < 0) COURSE.push(k); }); });
+var BYTOPIC = {}; QUESTIONS.forEach(function(q){ (BYTOPIC[q.t] = BYTOPIC[q.t] || []).push(q); });
+VOCAB.forEach(function(k){ if (BYTOPIC[k]) BYTOPIC[k].sort(function(a, b){ return (a.r || 0) - (b.r || 0); }); });
+function nowMin(){ return Math.floor(Date.now() / MINUTE); }
+function today(){ var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+
+var Prog = {
+  cache: {}, dirty: {}, timer: null,
+  topic: function(t){ if (!this.cache[t]) this.cache[t] = Object.assign({}, Store.get("p_" + t) || {}); return this.cache[t]; },
+  get: function(q){ return this.topic(q.t)[q.id]; },
+  record: function(q, ok){
+    var r = (this.get(q) || [0, 0, 0, 0, 0]).slice(), n = nowMin();
+    r[2]++; if (ok) r[3]++;
+    r[0] = ok ? (r[0] === 0 ? 2 : Math.min(r[0] + 1, INTERVALS.length - 1)) : 1;
+    r[1] = n + INTERVALS[r[0]]; r[4] = n;
+    this.topic(q.t)[q.id] = r; this.dirty[q.t] = 1; this.schedule();
+    var m = this.meta(), d = today();
+    m.days = m.days || {}; m.days[d] = (m.days[d] || 0) + 1;
+    var keys = Object.keys(m.days).sort(); if (keys.length > 60) delete m.days[keys[0]];
+    m.answered = (m.answered || 0) + 1; this.dirtyMeta = true;
+  },
+  meta: function(){ if (!this.metaDoc) this.metaDoc = Object.assign({}, Store.get("meta") || {}); return this.metaDoc; },
+  setCur: function(id){ var m = this.meta(); if (m.cur !== id){ m.cur = id; this.dirtyMeta = true; this.schedule(); } },
+  schedule: function(){ var self = this; clearTimeout(self.timer); self.timer = setTimeout(function(){ self.flush(); }, 2500); },
+  flush: function(){
+    var self = this; clearTimeout(self.timer);
+    Object.keys(self.dirty).forEach(function(t){ Store.put("p_" + t, self.cache[t]); }); self.dirty = {};
+    if (self.dirtyMeta){ Store.put("meta", self.metaDoc); self.dirtyMeta = false; }
+  },
+  reload: function(){ this.cache = {}; this.metaDoc = null; this.dirty = {}; this.dirtyMeta = false; },
+  topicStats: function(t){
+    var map = this.topic(t), total = (BYTOPIC[t] || []).length, seen = 0, mastered = 0, learned = 0, tries = 0, right = 0, due = 0, n = nowMin();
+    Object.keys(map).forEach(function(id){ var r = map[id]; if (!QBYID[id]) return; seen++; tries += r[2]; right += r[3]; if (r[0] >= 2) learned++; if (r[0] >= MASTER_BOX) mastered++; if (r[0] >= 1 && r[1] <= n) due++; });
+    return {total: total, seen: seen, learned: learned, mastered: mastered, acc: tries ? right / tries : 0, tries: tries, due: due};
+  },
+  streak: function(){
+    var days = this.meta().days || {}, s = 0, d = new Date();
+    if (!days[today()]) d.setDate(d.getDate() - 1);
+    for (;;){ var k = d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); if (!days[k]) break; s++; d.setDate(d.getDate() - 1); }
+    return s;
+  }
+};
+
+/* ---------------- scheduler: what comes next ---------------- */
+// A grammar topic is "solid" once you have met enough of it with good accuracy; new material then moves on in course order.
+function solid(t){ var s = Prog.topicStats(t); return s.seen >= Math.min(20, s.total) && s.acc >= 0.8; }
+function frontier(scope){
+  var g = COURSE.filter(function(t){ return scope.indexOf(t) >= 0; });
+  var open = g.filter(function(t){ return !solid(t) && hasUnseen(t); });
+  if (open.length) return open.slice(0, 3);
+  return g.filter(hasUnseen).map(function(t){ var s = Prog.topicStats(t); return {t: t, f: s.seen / s.total}; })
+    .sort(function(a, b){ return a.f - b.f; }).slice(0, 3).map(function(x){ return x.t; });
+}
+function hasUnseen(t){ var map = Prog.topic(t); return (BYTOPIC[t] || []).some(function(q){ return !map[q.id]; }); }
+function pickNew(topics, ordered){
+  var weights = [4, 2, 1];
+  var order = topics.map(function(t, i){ return {t: t, w: Math.random() * (weights[i] || 1)}; }).sort(function(a, b){ return b.w - a.w; });
+  for (var i = 0; i < order.length; i++){
+    var t = order[i].t, map = Prog.topic(t), fresh = (BYTOPIC[t] || []).filter(function(q){ return !map[q.id] && sess.recent.indexOf(q.id) < 0; });
+    if (!fresh.length) continue;
+    if (ordered) return fresh[0];
+    return fresh[Math.floor(Math.random() * fresh.length)];
+  }
+  return null;
+}
+function pickVocabNew(scope){
+  // vocabulary in frequency order across article / meaning / plural
+  var best = null;
+  scope.forEach(function(t){ var q = pickNew([t], true); if (q && (!best || (q.r || 0) < (best.r || 0))) best = q; });
+  return best;
+}
+function dueList(scope, ahead){
+  var n = nowMin() + (ahead || 0), out = [];
+  scope.forEach(function(t){ var map = Prog.topic(t); Object.keys(map).forEach(function(id){ var r = map[id]; if (r[0] >= 1 && r[1] <= n && QBYID[id] && sess.recent.indexOf(id) < 0) out.push({id: id, due: r[1], box: r[0]}); }); });
+  return out.sort(function(a, b){ return a.box - b.box || a.due - b.due; });
+}
+function nextQuestion(){
+  // 1. a question you just missed comes back after a few others
+  sess.retry.forEach(function(x){ x.wait--; });
+  var ri = sess.retry.findIndex(function(x){ return x.wait <= 0; });
+  if (ri >= 0){ var rq = sess.retry.splice(ri, 1)[0].q; return {q: rq, tag: "again"}; }
+  var gram = sess.scope.filter(function(t){ return VOCAB.indexOf(t) < 0; }), voc = sess.scope.filter(function(t){ return VOCAB.indexOf(t) >= 0; });
+  var useVocab = voc.length && (!gram.length || sess.count % 4 === 3);
+  var pool = useVocab ? voc : gram;
+  // 2. due reviews (two out of three turns while reviews are waiting)
+  var due = dueList(pool);
+  if (due.length && sess.count % 3 !== 2) return {q: QBYID[due[0].id], tag: "rev"};
+  // 3. new material: vocab by frequency, grammar along the course
+  var nq = useVocab ? pickVocabNew(voc) : pickNew(sess.mode === "learn" ? frontier(gram) : shuf(gram).slice(0, 3), false);
+  if (!nq && !useVocab) nq = pickNew(shuf(gram), false);
+  if (!nq && voc.length) nq = pickVocabNew(voc);
+  if (nq) return {q: nq, tag: "new"};
+  if (due.length) return {q: QBYID[due[0].id], tag: "rev"};
+  // 4. everything seen and nothing due: review what is due soonest
+  var soon = dueList(sess.scope, 60 * 24 * 365);
+  if (soon.length) return {q: QBYID[soon[0].id], tag: "rev"};
+  var any = shuf(QUESTIONS.filter(function(q){ return sess.scope.indexOf(q.t) >= 0 && sess.recent.slice(-3).indexOf(q.id) < 0; }));
+  return any.length ? {q: any[0], tag: "rev"} : null;
+}
+
+/* ---------------- progress card ---------------- */
+function renderProgress(){
+  var tot = 0, seen = 0, mast = 0, due = 0, learned = 0;
+  TOPICS.forEach(function(t){ var s = Prog.topicStats(t[0]); tot += s.total; seen += s.seen; learned += s.learned; mast += s.mastered; due += s.due; });
+  var m = Prog.meta(), td = (m.days || {})[today()] || 0, st = Prog.streak();
+  $("pmast").textContent = learned.toLocaleString("de-DE");
+  $("pmast2").textContent = "of " + tot.toLocaleString("de-DE") + " questions";
+  $("pdue").textContent = due.toLocaleString("de-DE");
+  $("ptoday").textContent = td;
+  $("pstreak").textContent = (td >= DAILY_GOAL ? "daily goal reached ✓" : "goal " + DAILY_GOAL + " a day") + (st ? " · " + st + "-day streak" : "");
+  $("pbarall").style.width = Math.max(learned ? 1 : 0, learned / tot * 100) + "%";
+  $("pseen").textContent = seen.toLocaleString("de-DE") + " seen · " + learned.toLocaleString("de-DE") + " learned (last answer right) · " + mast.toLocaleString("de-DE") + " mastered (right on 3+ spaced reviews)";
+  var fr = frontier(TOPICS.map(function(t){ return t[0]; }));
+  $("pnext").innerHTML = fr.length ? "Next up: " + fr.map(function(t){ var s = Prog.topicStats(t); return "<b>" + esc(TOPIC[t].title) + "</b> (" + s.seen + "/" + s.total + ")"; }).join(" · ") + " — plus vocabulary in frequency order" : "You have seen every grammar question — now it's all reviews.";
+  $("learn").textContent = m.answered ? "Weiter lernen →" : "Start learning →";
+  $("learnhint").textContent = m.answered ? "continues exactly where you stopped" : "starts with chapter 1 and adapts as you go";
+}
+
+/* ---------------- quiz setup ---------------- */
+$("qcount").textContent = QUESTIONS.length.toLocaleString("de-DE");
+var selTopics = TOPICS.map(function(t){ return t[0]; }), N = 20;
+(function(){
+  var html = "";
+  GROUPS.forEach(function(g){
+    html += '<div class="grp">' + g[0] + '</div><div class="chips">';
+    g[1].forEach(function(k){ if (!TOPIC[k]) return; var n = (BYTOPIC[k] || []).length;
+      html += '<button class="chip on" data-t="' + k + '">' + esc(TOPIC[k].title) + '<span class="c">' + n + '</span></button>'; });
+    html += '</div>';
+  });
+  $("tchips").innerHTML = html;
+  $("tchips").querySelectorAll(".chip").forEach(function(b){ b.onclick = function(){ var k = b.dataset.t, i = selTopics.indexOf(k); if (i < 0) selTopics.push(k); else selTopics.splice(i, 1); b.classList.toggle("on", i < 0); $("start").disabled = !selTopics.length; }; });
+})();
+$("tall").onclick = function(){ selTopics = TOPICS.map(function(t){ return t[0]; }); $("tchips").querySelectorAll(".chip").forEach(function(c){ c.classList.add("on"); }); $("start").disabled = false; };
+$("tnone").onclick = function(){ selTopics = []; $("tchips").querySelectorAll(".chip").forEach(function(c){ c.classList.remove("on"); }); $("start").disabled = true; };
+document.querySelectorAll("[data-n]").forEach(function(b){ b.onclick = function(){ N = +b.dataset.n; document.querySelectorAll("[data-n]").forEach(function(x){ x.classList.toggle("on", x === b); }); }; });
+$("learn").onclick = function(){ beginAdaptive(TOPICS.map(function(t){ return t[0]; }), Infinity, "learn"); };
+$("start").onclick = function(){ beginAdaptive(selTopics.slice(), N, "topics"); };
+$("startweak").onclick = function(){
+  var scored = COURSE.map(function(k){ var s = Prog.topicStats(k), st = (stats().topics || {})[k] || [0, 0];
+    var acc = s.tries >= 3 ? s.acc : (st[1] >= 3 ? st[0] / st[1] : 0.5 + Math.random() * 0.01); return {k: k, acc: acc}; });
+  scored.sort(function(a, b){ return a.acc - b.acc; });
+  beginAdaptive(scored.slice(0, 5).map(function(x){ return x.k; }), Math.min(N, 40), "topics");
+};
+$("startmist").onclick = function(){ beginFixed(shuf(openMistakes("quiz").map(function(m){ return QBYID[m.qid]; }).filter(Boolean))); };
+
+/* ---------------- quiz run ---------------- */
+// sess.fixed: a fixed list (mistakes) · otherwise questions come from nextQuestion()
+var sess = {scope: [], limit: 0, count: 0, retry: [], recent: [], mode: "", fixed: null}, cur = null, res = [], answered = false, curOpts = [];
+function show(id){ ["setup","quiz","result"].forEach(function(s){ $(s).classList.toggle("hidden", s !== id); }); if (id === "setup") renderProgress(); window.scrollTo(0, 0); }
+function beginAdaptive(scope, limit, mode){
+  if (!Speech.can) scope = scope.filter(function(t){ return t !== "hoeren"; });
+  if (!scope.length) return;
+  sess = {scope: scope, limit: limit, count: 0, retry: [], recent: [], mode: mode, fixed: null}; res = [];
+  var resume = mode === "learn" && Prog.meta().cur && QBYID[Prog.meta().cur];
+  showTab("quiz"); show("quiz");
+  cur = resume ? {q: QBYID[Prog.meta().cur], tag: (Prog.get(QBYID[Prog.meta().cur]) ? "rev" : "new")} : nextQuestion();
+  if (!cur){ show("setup"); return; }
+  ask();
+}
+function beginFixed(list){ if (!list.length) return; sess = {scope: [], limit: list.length, count: 0, retry: [], recent: [], mode: "fixed", fixed: list}; res = []; showTab("quiz"); show("quiz"); cur = {q: list[0], tag: "again"}; ask(); }
+function begin(list){ beginFixed(list); }
+function promptHTML(p){ return esc(p).replace(/___/g, '<span class="gap">&nbsp;?&nbsp;</span>'); }
+var TAGS = {"new": "new", "rev": "review", "again": "once more"};
+function ask(){
+  answered = false; var q = cur.q;
+  if (sess.mode === "learn") Prog.setCur(q.id);
+  var lim = isFinite(sess.limit);
+  $("pbar").style.width = (lim ? sess.count / sess.limit * 100 : Math.min(100, (((Prog.meta().days || {})[today()] || 0) / DAILY_GOAL) * 100)) + "%";
+  $("qtopic").textContent = TOPIC[q.t].title + " · " + TOPIC[q.t].ch;
+  $("qtag").innerHTML = '<span class="tag ' + cur.tag + '">' + TAGS[cur.tag] + '</span>';
+  $("qcnt").textContent = lim ? (sess.count + 1) + " / " + sess.limit : "today " + ((Prog.meta().days || {})[today()] || 0) + " · goal " + DAILY_GOAL;
+  $("qprompt").innerHTML = promptHTML(q.p) + (q.au ? '<div class="audio"><button class="btn" id="play">▶ Play</button><button class="btn ghost" id="playslow">Slow</button></div>' : '');
+  if (q.au){ $("play").onclick = function(){ Speech.say(q.au); }; $("playslow").onclick = function(){ Speech.say(q.au, 0.6); }; Speech.say(q.au); }
+  curOpts = shuf(q.o);
+  typing = typeMode && typeable(q);
+  if (typing){
+    $("qopts").innerHTML = '<div class="typebox"><input id="tin" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type the missing part…" aria-label="Your answer">' +
+      '<div class="uml">' + ["ä","ö","ü","ß","Ä","Ö","Ü"].map(function(c){ return '<button data-c="' + c + '">' + c + '</button>'; }).join("") + '<button class="btn primary" id="tcheck" style="margin-left:auto">Check</button></div></div>';
+    var tin = $("tin");
+    $("qopts").querySelectorAll("[data-c]").forEach(function(b){ b.onclick = function(){ var p = tin.selectionStart || tin.value.length; tin.value = tin.value.slice(0, p) + b.dataset.c + tin.value.slice(tin.selectionEnd || p); tin.focus(); tin.setSelectionRange(p + 1, p + 1); }; });
+    $("tcheck").onclick = function(){ if (tin.value.trim()) checkTyped(tin.value); };
+    tin.onkeydown = function(e){ if (e.key === "Enter"){ e.preventDefault(); if (tin.value.trim()) checkTyped(tin.value); } };
+    $("qfb").classList.add("hidden"); $("qnext").classList.add("hidden");
+    setTimeout(function(){ tin.focus({preventScroll: true}); }, 30);
+    return;
+  }
+  $("qopts").innerHTML = curOpts.map(function(o, i){ return '<button class="opt" data-o="' + esc(o) + '"><span class="k">' + (i + 1) + '</span><span class="t">' + esc(o) + '</span></button>'; }).join("");
+  $("qopts").querySelectorAll(".opt").forEach(function(b){ b.onclick = function(){ pick(b.dataset.o); }; });
+  $("qfb").classList.add("hidden"); $("qnext").classList.add("hidden");
+}
+/* ---------------- writing practice (typed answers) ---------------- */
+var typeMode = false, typing = false;
+try { typeMode = localStorage.getItem("a1trainer-type") === "1"; } catch(e){}
+$("typemode").checked = typeMode;
+$("typemode").onchange = function(){ typeMode = this.checked; try { localStorage.setItem("a1trainer-type", typeMode ? "1" : "0"); } catch(e){} };
+function typeable(q){ return q.p.indexOf("___") >= 0 && q.p.split("___").length === 2 && !q.au && q.o[0].length <= 30; }
+function normAns(x){ return String(x).trim().replace(/\s+/g, " ").replace(/[.!?,]+$/, ""); }
+function checkTyped(raw){
+  var q = cur.q, t = normAns(raw), c = normAns(q.o[0]);
+  var exact = t === c, caseOnly = !exact && t.toLowerCase() === c.toLowerCase();
+  var given = exact || caseOnly ? q.o[0] : (q.o.filter(function(o){ return normAns(o) === t; })[0] || t);
+  pick(given, caseOnly ? "Right — but watch the capital letters: „" + q.o[0] + "“." : "");
+}
+
+/* ---------------- speech: listening and speaking ---------------- */
+var Speech = {
+  can: !!(window.speechSynthesis && window.SpeechSynthesisUtterance),
+  rec: window.SpeechRecognition || window.webkitSpeechRecognition || null,
+  voice: function(){ var vs = this.can ? speechSynthesis.getVoices() : []; return vs.filter(function(v){ return /^de(-|_|$)/i.test(v.lang); }).sort(function(a, b){ return (b.localService ? 1 : 0) - (a.localService ? 1 : 0); })[0] || null; },
+  say: function(text, rate){
+    if (!this.can) return;
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text); u.lang = "de-DE"; u.rate = rate || 0.9; var v = this.voice(); if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  },
+  listen: function(onDone){
+    var r = new this.rec(); r.lang = "de-DE"; r.interimResults = false; r.maxAlternatives = 3;
+    r.onresult = function(e){ var alts = []; for (var i = 0; i < e.results[0].length; i++) alts.push(e.results[0][i].transcript); onDone(null, alts); };
+    r.onerror = function(e){ onDone(e.error || "error"); };
+    r.start(); return r;
+  }
+};
+if (Speech.can) speechSynthesis.getVoices();
+function wordsOf(x){ return String(x).toLowerCase().replace(/[.,!?;:„“"«»()]/g, " ").split(/\s+/).filter(Boolean); }
+function compareSpoken(target, alts){
+  var tw = wordsOf(target), best = null;
+  alts.forEach(function(a){ var aw = wordsOf(a), hits = tw.map(function(w){ return aw.indexOf(w) >= 0; }), n = hits.filter(Boolean).length; if (!best || n > best.n) best = {n: n, hits: hits, heard: a}; });
+  return {html: tw.map(function(w, i){ return '<span class="' + (best.hits[i] ? "hit" : "miss") + '">' + esc(w) + '</span>'; }).join(" "), score: best.n / tw.length, heard: best.heard};
+}
+function sentenceOf(q){ return q.au || q.s.map(function(x){ return x[0]; }).join(" ").replace(/\s+([.?!,])/g, "$1"); }
+
+function structHTML(q){
+  return '<div class="struct">' + q.s.map(function(x, i){
+    var lab = x[1], L = LABELS[lab];
+    if (!lab) return '<span class="seg plain" style="cursor:default"><span class="tx">' + esc(x[0]) + '</span><span class="lb">&nbsp;</span></span>';
+    return '<button class="seg" data-l="' + lab + '" style="color:var(--l-' + (LABCOL[lab] || "X") + ')"><span class="tx">' + esc(x[0]) + '</span><span class="lb">' + esc(L ? L[0] : lab) + '</span></button>';
+  }).join("") + '</div><div class="segexp"></div>';
+}
+function wireStruct(root){
+  root.querySelectorAll(".seg[data-l]").forEach(function(b){ b.onclick = function(){ var L = LABELS[b.dataset.l]; var ex = b.closest(".struct").nextElementSibling; if (ex && L) ex.innerHTML = "<b>" + esc(L[0]) + ":</b> " + esc(L[1]); }; });
+}
+function pick(given, note){
+  if (answered) return; answered = true;
+  var q = cur.q, ok = given === q.o[0];
+  if (typing) $("qopts").innerHTML = '<div class="opts"><div class="opt ' + (ok ? "ok" : "bad") + '"><span class="k">you</span><span class="t">' + esc(given) + '</span></div>' + (ok ? "" : '<div class="opt ok"><span class="k">✓</span><span class="t">' + esc(q.o[0]) + '</span></div>') + '</div>';
+  $("qopts").querySelectorAll(".opt").forEach(function(b){ b.disabled = true; if (b.dataset.o === q.o[0]) b.classList.add("ok"); else if (b.dataset.o === given) b.classList.add("bad"); });
+  res.push({q: q, ok: ok, given: given});
+  recordQuiz(q, given, ok);
+  Prog.record(q, ok);
+  sess.recent.push(q.id); if (sess.recent.length > 25) sess.recent.shift();
+  sess.misses = sess.misses || {};
+  if (!ok) sess.misses[q.id] = (sess.misses[q.id] || 0) + 1;
+  // a miss comes back 3–5 questions later, at most twice per session; after that the spaced review (5 min) takes over
+  if (!ok && !sess.fixed && sess.misses[q.id] <= 2) sess.retry.push({q: q, wait: 3 + Math.floor(Math.random() * 3)});
+  sess.count++;
+  if (sess.mode === "learn") Prog.setCur(null);
+  var h = "";
+  h += '<div class="verdict" style="color:var(--' + (ok ? "ok" : "red") + ')">' + (ok ? "Richtig!" : "Nicht ganz.") + '</div>';
+  if (note) h += '<div class="box ok">' + esc(note) + '</div>';
+  if (!ok){
+    var why = (q.d && q.d[given]) || "";
+    h += '<div class="box why"><h4>Why not „' + esc(given) + '“?</h4>' + (why ? esc(why) : "That option doesn't fit here — see the rule below.") + '</div>';
+  }
+  h += '<div class="box rule"><h4>' + (ok ? "Rule" : "Correct: „" + esc(q.o[0]) + "“ — the rule") + '</h4>' + q.w + (q.n ? '<div class="small" style="margin-top:4px">' + esc(q.n) + '</div>' : '') + '</div>';
+  h += '<div class="box" style="border:1px solid var(--line)"><h4>Sentence structure · tap a part</h4>' + structHTML(q) + '</div>';
+  var sent = sentenceOf(q), canSay = /\s/.test(sent) && VOCAB.indexOf(q.t) < 0 || q.t === "hoeren";
+  if (Speech.can || (Speech.rec && canSay)) h += '<div class="box" style="border:1px solid var(--line)"><h4>Pronunciation</h4><div class="row" style="margin:4px 0">' +
+    (Speech.can ? '<button class="btn ghost" id="hear">🔊 Hear it</button>' : '') + (Speech.rec && canSay ? '<button class="btn ghost" id="say">🎤 Say it</button>' : '') +
+    '<span class="small">' + esc(sent) + '</span></div><div class="sayres" id="sayres"></div></div>';
+  h += '<details class="lesson"' + (ok ? '' : ' open') + '><summary>Lesson: ' + esc(TOPIC[q.t].title) + '</summary><p>' + TOPIC[q.t].lesson + '</p></details>';
+  h += '<div class="ask"><div class="row" style="margin:0"><b style="font-size:.95rem">Still unclear?</b><button class="link" id="askopen">Ask Claude about this question</button></div>' +
+       '<div class="hidden" id="askbox"><textarea id="asktxt">' + esc(ok ? "Can you explain this rule with two more examples?" : "Why is „" + given + "“ wrong here, and how do I remember the right form?") + '</textarea><div class="row" style="margin:6px 0 0"><button class="btn" id="asksend">Ask</button></div><div class="answer" id="askans"></div></div></div>';
+  $("qfb").innerHTML = h; $("qfb").classList.remove("hidden"); wireStruct($("qfb"));
+  if ($("hear")) $("hear").onclick = function(){ Speech.say(sent); };
+  if ($("say")) $("say").onclick = function(){
+    var b = $("say"); b.disabled = true; b.textContent = "🎤 listening…"; $("sayres").textContent = "Speak now: „" + sent + "“";
+    try { Speech.listen(function(err, alts){
+      b.disabled = false; b.textContent = "🎤 Say it";
+      if (err){ $("sayres").textContent = err === "not-allowed" ? "Microphone access was blocked." : "Didn't catch that (" + err + ") — try again."; return; }
+      var r = compareSpoken(sent, alts);
+      $("sayres").innerHTML = (r.score >= 0.9 ? "<b>Sehr gut!</b> " : r.score >= 0.6 ? "<b>Fast!</b> " : "<b>Nochmal?</b> ") + r.html + '<div class="small">I heard: „' + esc(r.heard) + '“ · red words were missing or unclear.</div>';
+    }); } catch(e){ b.disabled = false; b.textContent = "🎤 Say it"; $("sayres").textContent = "Speech recognition isn't available here."; }
+  };
+  $("askopen").onclick = function(){ $("askbox").classList.toggle("hidden"); };
+  $("asksend").onclick = function(){
+    var ctx = TUTOR + "\n\nQuiz question: " + q.p + "\nOptions: " + q.o.join(" | ") + "\nCorrect answer: " + q.o[0] + "\nLearner chose: " + given + (ok ? " (correct)" : " (wrong)") +
+      "\nRule shown: " + q.w.replace(/<[^>]+>/g, "") + "\nFull sentence: " + q.s.map(function(x){ return x[0]; }).join(" ") + "\nTopic: " + TOPIC[q.t].title + "\n\nLearner's question: " + $("asktxt").value;
+    askClaude(ctx, $("askans"), $("asksend"));
+  };
+  $("qnext").classList.remove("hidden"); $("qnext").focus({preventScroll: true});
+}
+$("qnext").onclick = function(){
+  if (sess.fixed){ if (sess.count < sess.fixed.length){ cur = {q: sess.fixed[sess.count], tag: "again"}; ask(); } else finish(); return; }
+  if (sess.count >= sess.limit){ finish(); return; }
+  cur = nextQuestion(); if (cur) ask(); else finish();
+};
+$("qtopic").onclick = function(){ var d = $("qfb").querySelector("details.lesson"); if (d){ d.open = true; d.scrollIntoView({behavior: "smooth", block: "center"}); } else alert(TOPIC[cur.q.t].title + "\n\n" + TOPIC[cur.q.t].lesson.replace(/<[^>]+>/g, "")); };
+$("qquit").onclick = function(){ if (res.length) finish(); else show("setup"); };
+document.addEventListener("keydown", function(e){
+  if ($("quiz").classList.contains("hidden") || $("v-quiz").classList.contains("hidden")) return;
+  if (e.target && (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT")) return;
+  if (!answered && /^[1-4]$/.test(e.key)){ var o = curOpts[+e.key - 1]; if (o) pick(o); }
+  else if (answered && e.key === "Enter"){ e.preventDefault(); $("qnext").click(); }
+});
+function finish(){
+  flushStats(); Prog.flush();
+  if (!res.length){ show("setup"); return; }
+  var r = res.filter(function(x){ return x.ok; }).length, pct = Math.round(r / res.length * 100);
+  $("rscore").textContent = r + " / " + res.length;
+  $("rverdict").textContent = (sess.mode === "learn" ? "Progress saved — „Weiter lernen“ picks up from here. " : "") + (pct >= 90 ? "Sehr gut! That's solid." : pct >= 70 ? "Gut! A few gaps — check the topics in red." : "Keep going — missed questions come back soon, so they will stick.");
+  var by = {}; res.forEach(function(x){ var t = x.q.t; by[t] = by[t] || [0, 0]; by[t][1]++; if (x.ok) by[t][0]++; });
+  $("rtab").innerHTML = Object.keys(by).sort(function(a, b){ return by[a][0] / by[a][1] - by[b][0] / by[b][1]; }).map(function(t){ var p = by[t][0] / by[t][1];
+    return '<tr><td>' + esc(TOPIC[t].title) + '</td><td class="r">' + by[t][0] + '/' + by[t][1] + '</td><td style="width:30%"><span class="bar" style="width:' + Math.max(4, p * 100) + '%;background:' + (p < .6 ? "var(--red)" : "var(--ok)") + '"></span></td></tr>'; }).join("");
+  var w = res.filter(function(x){ return !x.ok; });
+  $("rredo").classList.toggle("hidden", !w.length);
+  $("rredo").onclick = function(){ begin(shuf(w.map(function(x){ return x.q; }))); };
+  $("rwrong").innerHTML = w.length ? '<h2>This round\'s mistakes</h2>' + w.map(function(x){ return '<div class="mist"><div class="q">' + promptHTML(x.q.p) + '</div><div><span class="y">' + esc(x.given) + '</span> → <span class="a">' + esc(x.q.o[0]) + '</span></div><div class="small">' + ((x.q.d && esc(x.q.d[x.given])) || x.q.w) + '</div></div>'; }).join("") : "";
+  $("pbar").style.width = "100%"; show("result"); refreshCounts();
+}
+$("ragain").onclick = function(){ show("setup"); };
+
+/* ---------------- mistakes view ---------------- */
+function renderMistakes(){
+  var showL = $("mshowl").checked;
+  var all = Store.all().filter(function(m){ return (m.k === "quiz" || m.k === "artikel") && (showL || !m.learned); });
+  var quiz = all.filter(function(m){ return m.k === "quiz"; }), art = all.filter(function(m){ return m.k === "artikel"; });
+  $("mart").disabled = !openMistakes("artikel").length; $("mpractice").disabled = !openMistakes("quiz").length;
+  if (!all.length){ $("mlist").innerHTML = '<p class="small">No ' + (showL ? "" : "open ") + 'mistakes yet. Do a quiz round — anything you get wrong lands here.</p>'; return; }
+  var by = {}; quiz.forEach(function(m){ (by[m.t] = by[m.t] || []).push(m); });
+  var h = "";
+  TOPICS.forEach(function(t){ var list = by[t[0]]; if (!list) return;
+    list.sort(function(a, b){ return (b.wc || 0) - (a.wc || 0); });
+    h += '<h2>' + esc(t[1]) + ' <span class="small">(' + list.length + ')</span></h2>';
+    list.forEach(function(m){ var q = QBYID[m.qid];
+      h += '<div class="mist" data-id="' + esc(m._id) + '"><div class="q">' + promptHTML(m.p) + '</div>' +
+        '<div><span class="y">' + esc(m.g) + '</span> → <span class="a">' + esc(m.c) + '</span> <span class="cnt">×' + (m.wc || 1) + '</span>' + (m.learned ? ' <span class="small">✓ learned</span>' : (m.rc ? ' <span class="small">· right ' + m.rc + '× since</span>' : '')) + '</div>' +
+        '<div class="small">' + esc(m.why || "") + ' ' + (q ? q.w.replace(/<[^>]+>/g, "") : "") + '</div>' +
+        '<div class="tools">' + (q ? '<button class="link" data-act="struct">sentence structure</button>' : '') + '<button class="link" data-act="ask">ask Claude</button><button class="link" data-act="learned">' + (m.learned ? "mark as open" : "mark as learned") + '</button><button class="link" data-act="del">delete</button></div><div class="xtra"></div></div>'; });
+  });
+  if (art.length){
+    h += '<h2>Articles <span class="small">(' + art.length + ')</span></h2><div class="grid">';
+    art.forEach(function(m){ h += '<div class="w ' + m.a + ' mist" style="padding:6px 10px" data-id="' + esc(m._id) + '"><div class="top"><span class="ar">' + m.a + '</span><span class="n">' + esc(m.n) + '</span><span class="r">(' + esc(m.r) + ')</span></div><div class="e">' + esc(m.e) + '</div><div class="x">you said <span class="y">' + esc(m.g) + '</span> <span class="cnt">×' + (m.wc || 1) + '</span>' + (m.x ? ' · ' + esc(m.x) : '') + '</div><div class="tools"><button class="link" data-act="learned">' + (m.learned ? "open" : "learned") + '</button><button class="link" data-act="del">delete</button></div></div>'; });
+    h += '</div>';
+  }
+  $("mlist").innerHTML = h;
+  $("mlist").querySelectorAll("[data-act]").forEach(function(b){ b.onclick = function(){
+    var el = b.closest("[data-id]"), id = el.dataset.id, m = Store.get(id), act = b.dataset.act;
+    if (act === "del"){ Store.del(id); renderMistakes(); refreshCounts(); }
+    else if (act === "learned"){ m.learned = !m.learned; m.rc = m.learned ? 2 : 0; Store.put(id, m); renderMistakes(); refreshCounts(); }
+    else if (act === "struct"){ var q = QBYID[m.qid]; var x = el.querySelector(".xtra"); x.innerHTML = structHTML(q); wireStruct(x); }
+    else if (act === "ask"){ var x2 = el.querySelector(".xtra"); x2.innerHTML = '<div class="ask"><div class="answer"></div></div>';
+      askClaude(TUTOR + "\n\nThe learner keeps getting this wrong (" + (m.wc || 1) + " times).\nQuestion: " + m.p + "\nTheir answers: " + (m.gs || [m.g]).join(", ") + "\nCorrect: " + m.c + "\nRule: " + (m.rule || "").replace(/<[^>]+>/g, "") + "\n\nExplain why the correct answer is right, why their answer is a natural mistake, and give a memory trick plus two new example sentences.", x2.querySelector(".answer")); }
+  }; });
+}
+$("mshowl").onchange = renderMistakes;
+$("mpractice").onclick = function(){ $("startmist").click(); };
+$("mart").onclick = function(){ var nouns = openMistakes("artikel").map(function(m){ return m.n; }); dictState.quiz = true; dictState.only = nouns; dictState.shuffled = true; showTab("dict"); };
+$("mpattern").onclick = function(){
+  var ms = openMistakes("quiz").sort(function(a, b){ return (b.wc || 0) - (a.wc || 0); }).slice(0, 40), as = openMistakes("artikel").slice(0, 30);
+  if (!ms.length && !as.length){ $("mpatbox").classList.remove("hidden"); $("mpatans").textContent = "No open mistakes yet — do a quiz round first."; return; }
+  var lines = ms.map(function(m){ return "- [" + m.topic + "] " + m.p + " | wrote: " + (m.gs || [m.g]).join("/") + " | correct: " + m.c + " | wrong " + (m.wc || 1) + "x"; }).join("\n");
+  var al = as.map(function(m){ return "- " + m.a + " " + m.n + " (said " + m.g + ", reason: " + m.r + ")"; }).join("\n");
+  $("mpatbox").classList.remove("hidden");
+  askClaude(TUTOR.replace("under 170 words", "under 280 words") + "\n\nHere are the learner's open mistakes from an A1 grammar quiz:\n" + lines + (al ? "\n\nArticle mistakes:\n" + al : "") +
+    "\n\nFind the 3–5 underlying patterns (not individual items). For each: name it, explain the rule in one or two sentences, give one quick tip. End with what to practise next.", $("mpatans"), $("mpattern"));
+};
+
+/* ---------------- dictionary ---------------- */
+var dictState = {art: "", band: "", theme: "", q: "", quiz: false, shuffled: false, order: null, limit: 300, right: 0, tried: 0, only: null};
+$("dcount").textContent = DICT.length.toLocaleString("de-DE");
+(function(){
+  var b = $("dband"), opts = '<option value="">All ' + DICT.length + ' words</option><option value="a1">Course list (A1 topics)</option>';
+  for (var i = 0; i < DICT.length; i += 500){ opts += '<option value="' + i + '">Most frequent ' + (i + 1) + '–' + Math.min(i + 500, DICT.length) + '</option>'; }
+  b.innerHTML = opts;
+  var themes = []; DICT.forEach(function(d){ if (d.t && themes.indexOf(d.t) < 0) themes.push(d.t); });
+  $("dtheme").innerHTML += themes.map(function(t){ return '<option>' + esc(t) + '</option>'; }).join("");
+})();
+function dictFiltered(){
+  var s = dictState, term = s.q.trim().toLowerCase(), idxs = s.order || DICT.map(function(_, i){ return i; });
+  return idxs.filter(function(i){ var d = DICT[i];
+    if (s.only) return s.only.indexOf(d.n) >= 0;
+    if (s.art && d.a !== s.art) return false;
+    if (s.band === "a1" && !d.t) return false;
+    if (s.band && s.band !== "a1" && (i < +s.band || i >= +s.band + 500)) return false;
+    if (s.theme && d.t !== s.theme) return false;
+    if (term && d.n.toLowerCase().indexOf(term) < 0 && d.e.toLowerCase().indexOf(term) < 0) return false;
+    return true; });
+}
+function wordCard(d, i){
+  var pl = d.p && d.p !== d.n ? 'pl. die ' + esc(d.p) : (d.p === d.n ? 'pl. unchanged' : '');
+  if (dictState.quiz) return '<div class="w" data-i="' + i + '"><div class="top"><span class="n">' + esc(d.n) + '</span></div><div class="e">' + esc(d.e) + '</div><div class="guess"><button data-g="der">der</button><button data-g="die">die</button><button data-g="das">das</button></div></div>';
+  return '<div class="w ' + d.a + '"><div class="top"><span class="ar">' + d.a + '</span><span class="n">' + esc(d.n) + '</span><span class="r">(' + esc(d.r) + ')</span></div><div class="e">' + esc(d.e) + '</div>' + ((d.x || pl) ? '<div class="x">' + [esc(d.x), pl].filter(Boolean).join(" · ") + '</div>' : '') + '</div>';
+}
+function renderDict(reset){
+  if (reset){ dictState.limit = 300; }
+  var list = dictFiltered(), shown = list.slice(0, dictState.limit);
+  $("dlist").innerHTML = shown.length ? '<div class="grid">' + shown.map(function(i){ return wordCard(DICT[i], i); }).join("") + '</div>' : '<p class="small">No words found.</p>';
+  $("dmore").classList.toggle("hidden", list.length <= dictState.limit);
+  $("dmore").textContent = "Show more (" + (list.length - dictState.limit) + " left)";
+  $("dquiz").classList.toggle("on", dictState.quiz); $("dshuf").classList.toggle("hidden", !dictState.quiz);
+  $("dscore").textContent = dictState.only ? "Practising your article mistakes · " + ($("dscore").dataset.s || "") : (dictState.quiz ? ($("dscore").dataset.s || "Tap der / die / das") : "");
+}
+$("dmore").onclick = function(){ dictState.limit += 300; renderDict(false); };
+$("dq").oninput = function(){ dictState.q = this.value; dictState.only = null; renderDict(true); };
+$("dband").onchange = function(){ dictState.band = this.value; dictState.only = null; renderDict(true); };
+$("dtheme").onchange = function(){ dictState.theme = this.value; dictState.only = null; renderDict(true); };
+document.querySelectorAll(".ab[data-art]").forEach(function(b){ b.onclick = function(){ dictState.art = b.dataset.art; dictState.only = null; document.querySelectorAll(".ab[data-art]").forEach(function(x){ x.classList.toggle("on", x === b); }); renderDict(true); }; });
+$("dquiz").onclick = function(){ dictState.quiz = !dictState.quiz; dictState.right = 0; dictState.tried = 0; $("dscore").dataset.s = ""; if (!dictState.quiz){ dictState.order = null; dictState.only = null; } renderDict(true); };
+$("dshuf").onclick = function(){ dictState.order = shuf(DICT.map(function(_, i){ return i; })); renderDict(true); };
+$("dlist").addEventListener("click", function(e){
+  var b = e.target.closest(".guess button"); if (!b) return;
+  var w = b.closest(".w"); if (w.dataset.done) return; w.dataset.done = "1";
+  var d = DICT[+w.dataset.i], ok = b.dataset.g === d.a;
+  dictState.tried++; if (ok) dictState.right++;
+  w.querySelectorAll(".guess button").forEach(function(x){ if (x.dataset.g === d.a) x.classList.add("ok"); else if (x === b) x.classList.add("bad"); });
+  w.classList.add(d.a);
+  w.querySelector(".top").insertAdjacentHTML("beforeend", '<span class="r">(' + esc(d.r) + ')</span>');
+  if (d.x) w.insertAdjacentHTML("beforeend", '<div class="x">' + esc(d.x) + '</div>');
+  recordArticle(d, b.dataset.g, ok);
+  $("dscore").dataset.s = dictState.right + " / " + dictState.tried + " richtig";
+  $("dscore").textContent = (dictState.only ? "Practising your article mistakes · " : "") + $("dscore").dataset.s;
+});
+
+/* ---------------- grammar view ---------------- */
+function renderGram(){
+  $("leg").innerHTML = Object.keys(LABELS).map(function(k){ return '<button class="seg" data-l="' + k + '" style="color:var(--l-' + (LABCOL[k] || "X") + ')"><span class="lb">' + esc(LABELS[k][0]) + '</span></button>'; }).join("");
+  $("leg").querySelectorAll(".seg").forEach(function(b){ b.onclick = function(){ var L = LABELS[b.dataset.l]; $("legexp").innerHTML = "<b>" + esc(L[0]) + ":</b> " + esc(L[1]); }; });
+  var st = stats().topics || {};
+  $("glist").innerHTML = TOPICS.map(function(t){ var p = Prog.topicStats(t[0]);
+    var acc = p.tries ? Math.round(p.acc * 100) + "% right · " + p.seen + "/" + p.total + " seen · " + p.learned + " learned · " + p.mastered + " mastered" + (p.due ? " · " + p.due + " due" : "") : "not practised yet · " + p.total + " questions";
+    return '<div class="lesson-card"><h3>' + esc(t[1]) + ' <span class="small">· ' + esc(t[2]) + '</span></h3><p>' + t[3] + '</p><div class="row" style="margin:4px 0"><button class="btn ghost" data-pt="' + t[0] + '">Practise</button><span class="mbar" title="learned"><i style="width:' + (p.learned / p.total * 100) + '%"></i></span><span class="small">' + acc + '</span></div></div>'; }).join("");
+  $("glist").querySelectorAll("[data-pt]").forEach(function(b){ b.onclick = function(){ beginAdaptive([b.dataset.pt], 20, "topics"); }; });
+}
+
+window.addEventListener("pagehide", function(){ flushStats(); Prog.flush(); });
+document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden"){ flushStats(); Prog.flush(); } });
+Store.init().then(refreshCounts);
+refreshCounts(); renderProgress();
+})();
+</script>
+</body>
+</html>
