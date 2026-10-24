@@ -19,7 +19,7 @@ One self-contained web page with four parts:
 
 ## Build
 
-    python3 build.py        # -> dist/a1-trainer.html, dist/questions.json
+    python3 build.py        # -> dist/a1-trainer.html (+ dist/index.html), dist/questions.json
 
 No dependencies beyond Python 3.
 
